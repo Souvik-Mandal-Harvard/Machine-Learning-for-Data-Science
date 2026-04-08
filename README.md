@@ -33,5 +33,7 @@ Frameworks for discovery and data structure analysis. Focus areas include:
 ## Usage & Reproducibility
 Each directory contains a modular `requirements.txt` or environment configuration to ensure consistent execution across research and enterprise environments.
 
-## Setting Up Your Environment
-For running the notebooks on your local machine, you need to first create a virtual Python environment. Inn case you need help with that, please read the `ML_PYTHON_JUPYTER_VENV_SETUP_GUIDE.md` document.
+## Quick Start: Environment Setup
+
+Before executing notebooks locally, establish a Python virtual environment. Refer to `ML_PYTHON_JUPYTER_VENV_SETUP_GUIDE.md` for detailed configuration instructions. Once configured, open any Jupyter notebook from the repository to begin.
+
