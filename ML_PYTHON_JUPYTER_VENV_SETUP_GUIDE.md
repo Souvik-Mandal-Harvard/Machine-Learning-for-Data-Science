@@ -191,8 +191,7 @@ To stop the server when you are done, go back to the terminal and press `Ctrl + 
     - If you still don't see ML_Venv, run an interactive cell printing `sys.executable` / `sys.version` to confirm the interpreter in use.
     - Try the next step.
 
-2.3. Tell VS Code where to look
-    VS Code automatically scans standard folders (like .venv or envs) but it does not scan custom folders like `ML_Venv` by default. To make sure environments in this folder always show up in the future:
+2.3. Tell VS Code where to look: VS Code automatically scans standard folders (like .venv or envs) but it does not scan custom folders like `ML_Venv` by default. To make sure environments in this folder always show up in the future:
     - Press `Cmd + ,` to open Settings.
 	- Search for "Python: Venv Folders".
 	- Add the parent path of your environments (where you saved the folder containing the virtual environment): `/path/to/ML_Venv`
