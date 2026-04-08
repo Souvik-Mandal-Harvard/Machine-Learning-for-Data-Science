@@ -46,14 +46,14 @@ Most supervised ML can be viewed as **function approximation**:
 - predicted outputs come out.
 
 Conceptually:
-$$
+```math
 \hat{y} = f(x)
-$$
+```
 
 With multiple features:
-$$
+```math
 \hat{y} = f(x_1, x_2, \ldots, x_p)
-$$
+```
 
 The model does not discover universal truth. It learns a useful approximation from finite data, under assumptions, for a specific context and objective.
 
@@ -66,9 +66,9 @@ In supervised learning, each training example includes:
 The model learns from historical pairs $(X, y)$ and then predicts $\hat{y}$ for new $X$.
 
 A useful abstraction is:
-$$
+```math
 \hat{y} = f(X; \theta)
-$$
+```
 where:
 - $\theta$ are model parameters learned from data,
 - $f$ is the model family (linear model, tree, etc.).
@@ -97,9 +97,9 @@ For regression, common losses include:
 - absolute error.
 
 General training objective:
-$$
+```math
 \min_{\theta} \; J(\theta)
-$$
+```
 
 The optimization algorithm (such as gradient-based methods in many models) iteratively updates parameters to reduce loss. The point is not just to fit known examples, but to learn patterns that transfer to unseen data.
 
@@ -183,18 +183,18 @@ Before coding, be fluent with these terms:
 
 ### Simple Linear Regression
 One predictor:
-$$
+```math
 \hat{y} = \beta_0 + \beta_1 x
-$$
+```
 
 Interpretation of $\beta_1$:
 - expected change in $\hat{y}$ for a one-unit increase in $x$.
 
 ### Multiple Linear Regression
 Many predictors:
-$$
+```math
 \hat{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \cdots + \beta_p x_p
-$$
+```
 
 Interpretation of $\beta_j$:
 - expected change in $\hat{y}$ for a one-unit increase in $x_j$, **holding other features constant**.
@@ -218,21 +218,21 @@ Even when the final production model is non-linear, linear regression is often t
 ### Common Metrics
 
 - **MSE (Mean Squared Error):**
-$$
+```math
 \text{MSE} = \frac{1}{n}\sum_{i=1}^{n}(y_i - \hat{y}_i)^2
-$$
+```
   Heavily penalizes large errors.
 
 - **RMSE (Root Mean Squared Error):**
-$$
+```math
 \text{RMSE} = \sqrt{\text{MSE}}
-$$
+```
   Same unit as target, easier to interpret than MSE.
 
 - **MAE (Mean Absolute Error):**
-$$
+```math
 \text{MAE} = \frac{1}{n}\sum_{i=1}^{n}|y_i - \hat{y}_i|
-$$
+```
   More robust to outliers than MSE.
 
 - **$R^2$ (Coefficient of Determination):**
