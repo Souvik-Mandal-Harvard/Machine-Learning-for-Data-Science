@@ -1,6 +1,7 @@
 # Supervised Machine Learning with a Regression-First Lens
 
-The goal of this notebook is to build a strong conceptual foundation before you move to coding notebooks.
+The goal of this document is to build a strong conceptual foundation before you move to programming. Start with the Jupyter notebooks that have `Regression` in the file name, following the sequence of the `guide` number. For instance, start with the notebook `Guide01_Supervised-ML_Regression.ipynb`, then move to `Guide02_Supervised-ML_Regression.ipynb`.
+Next, move to the notebooks with `Classification` in the file name. All the notebooks are self-explanatory.
 
 By the end of this guide, you should clearly understand:
 - where machine learning sits inside artificial intelligence,
@@ -16,7 +17,7 @@ Artificial Intelligence (AI) is the broad field of building systems that can per
 
 In practical terms:
 - Rule-based programming says: "if condition A happens, do B."
-- ML says: "learn the mapping from examples, then make predictions on new cases."
+- ML says: "Learn the mapping from examples, then make predictions on new cases."
 
 ML is useful when:
 - the process is too complex to write as explicit rules,
@@ -33,7 +34,7 @@ A model is a simplified representation of a real-world process. Like a map, a go
 
 All modeling involves trade-offs:
 - Too simple: important patterns are missed.
-- Too complex: noise may be learned as if it were signal.
+- Too complex: noise may be learned as if it were a signal.
 
 This signal-vs-noise tension appears throughout ML and is central to understanding regression and model evaluation.
 
@@ -109,7 +110,7 @@ The optimization algorithm (such as gradient-based methods in many models) itera
 
 A model is valuable only if it performs well on new, unseen observations.
 
-That is why we split data into:
+That is why we split the data into:
 - **Training set:** used to learn parameters,
 - **Validation/Test set:** used to estimate out-of-sample performance.
 
@@ -275,7 +276,7 @@ In prediction-focused workflows, violations do not automatically make a model us
 
 ## 16. End-to-End Supervised Regression Workflow
 
-1. Frame the problem and define target, features, and success metric.
+1. Frame the problem and define the target, features, and success metric.
 2. Understand data context, quality, and collection process.
 3. Split data for training and evaluation.
 4. Build a baseline model (often linear regression).
@@ -303,7 +304,7 @@ If you keep asking "What decision am I making, and why?" while coding, your prac
 
 ## 18. Final Big-Picture Summary
 
-- Machine learning is function approximation from data.
+- Machine learning is a function approximation from data.
 - Supervised learning uses labeled examples to learn predictive mappings.
 - Regression predicts continuous outcomes and is the most transparent entry point to supervised ML.
 - Good modeling is not just fitting; it is generalizing, diagnosing, improving, and communicating.
