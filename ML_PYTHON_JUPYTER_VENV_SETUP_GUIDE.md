@@ -183,15 +183,16 @@ To stop the server when you are done, go back to the terminal and press `Ctrl + 
 
 ### 8.2. How to use Jupyter Notebook in VS Code
 
-2.1. Open the notebook in VS Code, then click the kernel selector (top-right of the notebook).
+8.2.1. Open the notebook in VS Code, then click the kernel selector (top-right of the notebook).
     - Click on "Jupyter Kernel"
     - Choose **ML_Venv**, if you see it.
 
-2.2. If you do not see `ML_Venv` in the list, go back and check "Python Environments`.
+8.2.2. If you do not see `ML_Venv` in the list, go back and check "Python Environments`.
     - If you still don't see ML_Venv, run an interactive cell printing `sys.executable` / `sys.version` to confirm the interpreter in use.
     - Try the next step.
 
-2.3. Tell VS Code where to look: VS Code automatically scans standard folders (like .venv or envs) but it does not scan custom folders like `ML_Venv` by default. To make sure environments in this folder always show up in the future:
+8.2.3. Tell VS Code where to look: VS Code automatically scans standard folders (like .venv or envs) but it does not scan custom folders like `ML_Venv` by default. To make sure environments in this folder always show up in the future:
+
     - Press `Cmd + ,` to open Settings.
 	- Search for "Python: Venv Folders".
 	- Add the parent path of your environments (where you saved the folder containing the virtual environment): `/path/to/ML_Venv`
