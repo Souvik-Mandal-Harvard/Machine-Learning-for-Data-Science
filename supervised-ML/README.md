@@ -1,6 +1,7 @@
-# Supervised Machine Learning with a Regression-First Lens
+# Supervised Machine Learning: Starting with Regression
 
 The goal of this document is to build a strong conceptual foundation before you move to programming. Start with the Jupyter notebooks that have `Regression` in the file name, following the sequence of the `guide` number. For instance, start with the notebook `Guide01_Supervised-ML_Regression.ipynb`, then move to `Guide02_Supervised-ML_Regression.ipynb`.
+
 Next, move to the notebooks with `Classification` in the file name. All the notebooks are self-explanatory.
 
 By the end of this guide, you should clearly understand:
