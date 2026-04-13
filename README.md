@@ -37,3 +37,6 @@ Each directory contains a modular `requirements.txt` or environment configuratio
 
 Before executing notebooks locally, establish a Python virtual environment. Refer to [ML_PYTHON_JUPYTER_VENV_SETUP_GUIDE.md](ML_PYTHON_JUPYTER_VENV_SETUP_GUIDE.md) for detailed configuration instructions. Once configured, open any Jupyter notebook from the repository to begin.
 
+### How to use the notebooks
+
+- Read each task prompt before running the code cell under it.
