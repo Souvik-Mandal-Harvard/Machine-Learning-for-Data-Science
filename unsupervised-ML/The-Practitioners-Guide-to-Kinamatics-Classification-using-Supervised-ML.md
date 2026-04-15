@@ -5,11 +5,12 @@ This guide outlines the technical workflow for transforming raw, high-dimensiona
 ---
 
 ## 1. Spatial Normalization and Invariance
-**The Objective:** Transform raw $x,y$ coordinate data into a participant-centric coordinate system.
-**The Rationale:** Raw coordinates provided by computer vision models are "view-dependent," meaning they are influenced by the camera’s distance, angle, and field of view. To ensure the model learns *kinematic patterns* rather than *spatial positioning*, we perform two transforms:
-* **Translation:** Centering a "root" joint (typically the mid-hip) at the origin $(0,0)$. This focuses the model on relative limb movement.
-* **Scaling:** Dividing coordinates by a reference length (e.g., torso height) to ensure that the physical size of a participant does not bias the model.
+**The Objective:** Transform raw x,y coordinate data into a participant-centric and scale-independent representation.
+**The Rationale:** Raw coordinates provided by computer vision models are "view-dependent," meaning they are influenced by the camera’s distance, angle, and field of view. To ensure the model learns kinematic patterns rather than spatial positioning, we apply three layers of normalization:
 
+* **Translation:** Centering a "root" joint (typically the mid-hip) at the origin (0,0). This eliminates "global position" bias, focusing the model exclusively on relative limb movement.
+* **Scaling:** Dividing coordinates by a reference skeletal length (e.g., torso height). This ensures that the physical stature of a participant—or their distance from the lens—does not introduce artificial variance into the dataset.
+* **Angular Transformation:** Deriving joint angles (e.g., knee flexion, elbow extension) from coordinate triplets. Because angles are properties of the vectors between joints, they are inherently invariant to both translation and scaling. This provides the model with "pose-primitive" features that remain constant across different camera setups and body types.
 ---
 
 ## 2. Temporal Feature Engineering
