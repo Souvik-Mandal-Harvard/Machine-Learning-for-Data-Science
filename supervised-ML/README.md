@@ -98,12 +98,7 @@ For regression, common losses include:
 - squared error,
 - absolute error.
 
-General training objective:
-```math
-\min_{\theta} \; J(\theta)
-```
-
-The optimization algorithm (such as gradient-based methods in many models) iteratively updates parameters to reduce loss. The point is not just to fit known examples, but to learn patterns that transfer to unseen data.
+The optimization algorithm (such as gradient-based methods in many models) iteratively updates parameters to reduce loss. The point is not just to fit known examples, but to learn patterns that can predict well on unseen data.
 
 ---
 
@@ -119,7 +114,7 @@ If training performance is excellent but test performance is weak, the model may
 
 ## 8. Modeling Objectives: Interpretation vs Prediction
 
-Before choosing algorithms, define the objective clearly.
+Before choosing algorithms, clearly define the objective.
 
 ### Interpretation Objective
 You want to understand *why* outcomes change.
@@ -150,7 +145,7 @@ Most projects need both:
 - enough interpretability for trust, communication, and policy,
 - enough predictive power for operational value.
 
-This is why regression remains central in education: it gives a strong balance of transparency, rigor, and predictive utility.
+This is why regression remains central in education: it balances transparency, rigor, and predictive utility.
 
 ---
 
