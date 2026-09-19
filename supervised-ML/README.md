@@ -17,7 +17,7 @@ By the end of this guide, you should clearly understand:
 Artificial Intelligence (AI) is the broad field of building systems that can perceive, reason, decide, and act. **Machine Learning (ML)** is a subfield of AI that learns patterns from data rather than relying only on hand-written rules.
 
 In practical terms:
-- Rule-based programming says: "if condition A happens, do B."
+- Rule-based programming says: "If condition A happens, do B."
 - ML says: "Learn the mapping from examples, then make predictions on new cases."
 
 ML is useful when:
@@ -72,17 +72,17 @@ A useful abstraction is:
 \hat{y} = f(X; \theta)
 ```
 where:
-- $\theta$ are model parameters learned from data,
 - $f$ is the model family (linear model, tree, etc.).
+- $\theta$ are model parameters learned from data,
 
 ---
 
 ## 5. Parameters vs Hyperparameters
 
-beginners often confuse these, so keep them separate:
+Beginners often confuse these, so keep them separate:
 
-- **Parameters:** learned during training from data (for linear regression: intercept and coefficients).
-- **Hyperparameters:** chosen before training to control learning behavior (for example, regularization strength, polynomial degree, or solver choices depending on model class).
+- **Parameters:** learned during training from data (for example, the intercept and coefficients for linear regression).
+- **Hyperparameters:** chosen by the practitioner before training to control learning behavior (for example, regularization strength, polynomial degree, or solver choices depending on model class).
 
 Think of it this way:
 - Parameters are what the algorithm *discovers*.
@@ -111,7 +111,7 @@ The optimization algorithm (such as gradient-based methods in many models) itera
 
 A model is valuable only if it performs well on new, unseen observations.
 
-That is why we split the data into:
+That is why we split the available data into:
 - **Training set:** used to learn parameters,
 - **Validation/Test set:** used to estimate out-of-sample performance.
 
