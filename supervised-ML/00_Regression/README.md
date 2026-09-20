@@ -5,7 +5,7 @@ This directory contains the linear regression reading material and hands-on Jupy
 ## Reading Order
 
 1. **Background (optional refresher):** [../Guide00_Introduction-to-Supervised-Machine-Learning.md](../Guide00_Introduction-to-Supervised-Machine-Learning.md) for the core concepts.
-2. **Read the workflow guide:** [Guide00_Supervised-ML_Linear_Regression_basic_workflow_level-01.md](Guide00_Supervised-ML_Linear_Regression_basic_workflow_level-01.md). It gives the step-by-step recipe that the notebooks practice.
+2. **Read the workflow guide:** [Guide00_Supervised-ML_Linear_Regression_end-to-end_workflow.md](Guide00_Supervised-ML_Linear_Regression_end-to-end_workflow.md). It walks through the 13-stage regression workflow, from defining the problem to monitoring a deployed model, and shows which notebook practices each stage.
 3. **Work through the notebooks** `Guide01` to `Guide05` in order (table below).
 
 ## Notebooks
