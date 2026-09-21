@@ -1,10 +1,10 @@
-# Guide00: The End to End Linear Regression Workflow Concepts
+# Guide00: An End-to-End Linear Regression Workflow
 
-This guide turns the ideas from the [Introduction to Supervised Machine Learning](../Guide00_Introduction-to-Supervised-Machine-Learning.md) into a concrete, repeatable recipe for a regression project, from the first question to a model that is running, monitored, and improved. Read it before opening the notebooks: it is the map, and each notebook (`Guide01`–`Guide05`) walks through one part of the territory in depth.
+This guide is a recipe for a regression project for first-time users, guiding from the first question to a model that is running, monitored, and improved. Read it before opening the notebooks: it is the map, and each notebook (`Guide01`–`Guide05`) walks through one part of the territory in depth.
 
 By the end of this guide, you should be able to:
 * name the 13 stages of a typical regression project and say what happens in each,
-* explain why the train-test split is its own stage and why it comes before exploration and transformation,
+* explain the train-test split, and why it comes before exploration and transformation,
 * explain what cross-validation, regularization, and grid search each add, and why they come after a baseline,
 * explain why the workflow is a loop, not a straight line,
 * find which notebook practices each stage.
@@ -42,8 +42,8 @@ Not every project needs every sub-step of Stage 6. Apply only what your data cal
 ### Rule 1: Learn from training data only
 The test set stands in for future, unseen data. If any information from it leaks into training, your test score is no longer an honest estimate of real-world performance. This is called **data leakage**.
 
-Anything that *learns something from data* must be fit on the training set only, then applied to the test set:
-* the median an imputer computes,
+A model that *learns something from data must be fit on the training set only*, then applied to the test set:
+* the median an imputer (a tool or algorithm used to fill in missing values in a dataset) computes,
 * the categories an encoder discovers,
 * the mean and standard deviation a scaler computes,
 * the $\lambda$ found by a Box-Cox transformation.
@@ -53,6 +53,8 @@ In scikit-learn terms: call `fit` / `fit_transform` on training data, and only `
 ### Rule 2: Touch the test set once
 Tuning decisions (which polynomial degree, which regularization strength) are made using the *training* data, via cross-validation. The test set is used a single time, at the end of Stage 10. If you keep adjusting the model until the test score looks good, the test set has become part of training.
 
+You may still look at test-set residuals at that point to describe the model's weaknesses in your report, but any finding there must not send you back to change features or hyperparameters — that would silently turn Stage 10 into another round of tuning. Treat it as evidence for a future project (Loop 2, Section 9), not a fix to the current one.
+
 ---
 
 ## 3. Stages 1–3: Define, Understand, and Clean
@@ -60,15 +62,15 @@ Tuning decisions (which polynomial degree, which regularization strength) are ma
 ### Stage 1. Define the Problem
 State the question in plain language ("How much will this house sell for?"). Then pin down:
 * the **target** ($y$, a continuous quantity) and the candidate **features** ($X$),
-* the **success metric** (for example, MAE in dollars), chosen *before* you see any results,
+* the **success metric** (for example, MAE in dollars), chosen depending on your question and data type *before* you see any results,
 * the **objective**: *interpretation* (why does $y$ change?) or *prediction* (how accurate is the forecast?), since that shapes how you model,
 * what a **good enough** result looks like, and how a prediction will be used.
 
 ### Stage 2. Understand the Data
 Before touching the data, learn where it came from and what it means:
 * the **source** and how it was collected (surveys, sensors, transactions), including known biases and the time period covered,
-* what **one row** represents (a house? a sale? a customer-month?),
-* what each **column** means, its unit, and its type (numeric, categorical, date),
+* what **one row** represents,
+* what each **column** means, its unit, and its type (e.g., numeric, categorical, date, etc.),
 * how the **target** was defined and measured.
 
 This context tells you what is plausible, which values are errors, and whether the model will generalize to where you want to use it (a model trained on Ames, Iowa says little about Boston).
@@ -80,12 +82,14 @@ Only do fixes here that **do not learn from the data** (removing duplicates, cor
 
 ---
 
-## 4. Stages 4–6: Split, Explore, and Transform
+## 4. Stages 4–6: Split, Explore, and Transform the Data
 
 ### Stage 4. Split Into Training and Test Sets
-Split into `X_train`, `X_test`, `y_train`, `y_test` (for example, 80/20). Fix `random_state` so results are reproducible. From here on, **the test set is off limits** until Stage 10: no plots, no statistics, no tuning.
+Split the data into `X_train`, `X_test`, `y_train`, `y_test` (for example, 80/20). Fix `random_state` so results are reproducible. From here on, **the test set is off limits** until Stage 10: no plots, no statistics, no tuning.
 
 The split comes *before* exploration because what you see while exploring shapes the choices you make (which features to keep, which transformations to try). If you explore the test rows, they influence those choices.
+
+This is narrower than "look at the data only after splitting." Stage 2 (what a row and column mean) and Stage 3 (fixing typos, duplicates, units) do not depend on which rows end up in training or test, so they can happen before the split. What must wait for training data only is any look that could shape a *modeling* decision — that is Stage 5.
 
 ### Stage 5. Explore the Data (Training Set Only)
 Use summary statistics and plots on the training set to understand its structure:
@@ -99,29 +103,39 @@ This is where you decide which parts of Stage 6 your data needs.
 ### Stage 6. Transform the Data
 Linear regression needs a numeric, complete, reasonably well-behaved feature matrix. This stage gets your data into that shape. **Every technique here is fit on `X_train` and only applied to `X_test`.** A sensible order is: impute → encode → engineer → scale (the target is transformed separately).
 
-**6.1 Handle missing values.** Most scikit-learn models cannot handle missing values.
+#### 6.1 Handle missing values.** 
+
+Most scikit-learn models cannot handle missing values.
 * *Impute:* fill with the median (numeric, robust to outliers), the mean, or the most frequent value (categorical). Compute the fill value from `X_train` only.
 * *Drop* rows or columns, when only a few are affected or a column is mostly empty.
-* *Add a "was missing" indicator* when the missingness itself carries information.
+* *Add a "was missing" indicator* when the "missingness" itself carries information.
 
-**6.2 Encode categorical features.** Linear regression needs numbers.
-* *Nominal categories* (no natural order, such as car brand): one-hot encoding creates one 0/1 column per category. For plain linear regression, drop one level per category so coefficients stay uniquely interpretable. Set the encoder to ignore categories that appear only in the test data.
+#### 6.2 Encode categorical features.** 
+
+Linear regression needs numbers.
+* *Nominal categories* (no natural order, such as car brand): one-hot encoding creates one 0/1 column per category. For plain linear regression, drop one level per category so coefficients stay uniquely interpretable. Set the encoder to ignore categories that appear only in the test data. This drop-one-level advice is for *plain, unregularized* linear regression; Ridge and Lasso (Stage 9.2) can handle the redundant column, so pipelines built around a regularized model, like Sketch B, often keep every level and let the penalty manage the redundancy.
 * *Ordinal categories* (natural order, such as "poor < fair < good"): map to ordered integers.
 * *Many rare categories:* group rare levels into an "other" bucket first. One-hot encoding adds one column per level, which can inflate the feature count and cause overfitting.
 
-**6.3 Engineer features (polynomials and interactions).** To capture non-linear relationships while keeping a linear model, create new features:
+#### 6.3 Engineer features (polynomials and interactions).** 
+
+To capture non-linear relationships while keeping a linear model, create new features:
 * *Polynomial terms* ($x^2$, $x^3$) let the fitted line curve.
 * *Interaction terms* ($x_1 \cdot x_2$) let one feature's effect depend on another.
 * *Domain-driven features* (ratios, differences, "age of house" from a year column) often help more than any automatic method.
 
 `PolynomialFeatures` learns nothing from the data, so it cannot leak by itself, but following the fit-on-train habit is the safer default. Watch the column count: it grows quickly with degree and with the number of features, which raises the risk of overfitting. Stage 9 addresses that risk.
 
-**6.4 Transform the target.** Linear regression does not require the *target* to be normal. Normally distributed *residuals* matter mainly for inference (confidence intervals and p-values). Still, transforming a strongly skewed target (typical for prices and incomes) often stabilizes the error variance and improves the fit.
-* Check the distribution of `y_train` (histogram, `stats.normaltest`).
+#### 6.4 Transform the target.** 
+
+Linear regression does not require the *target* to be normal. Normally distributed *residuals* matter mainly for inference (confidence intervals and p-values). Still, transforming a strongly skewed target (typical for prices and incomes) often stabilizes the error variance and improves the fit.
+* Check the distribution of `y_train` for skewness (histogram, skewness statistic) — the goal is to spot a long tail, not to test the target itself for normality.
 * If it is skewed, apply a log, square-root, or Box-Cox transformation to `y_train` only.
 * **Crucial:** save the transformation parameters (like the Box-Cox $\lambda$) so you can invert it when you predict.
 
-**6.5 Scale the features.** Standardize (zero mean, unit variance) or normalize (fixed range) the features.
+#### 6.5 Scale the features.** 
+
+Standardize (zero mean, unit variance) or normalize (fixed range) the features.
 * Plain least-squares predictions do not change with feature scale, but scaling **matters for regularization** (Stage 9: the penalty treats all coefficients equally, so features must be comparable), for gradient-based solvers, and for comparing coefficient sizes.
 * Fit the scaler (e.g., `StandardScaler`) on `X_train`; use it to transform both `X_train` and `X_test`.
 
@@ -131,9 +145,10 @@ Linear regression needs a numeric, complete, reasonably well-behaved feature mat
 
 ### Stage 7. Baseline Model
 Always start with a simple model. It gives you a benchmark that every later improvement must beat.
+* **Trivial baseline first:** predict the training mean for every row (`DummyRegressor(strategy="mean")`). This tells you whether the model is doing anything at all; ordinary linear regression is the substantive baseline that later improvements (Stage 9) must beat.
 * **Fit:** train the linear regression on the processed training data (the transformed `X_train` and the transformed `y_train`). This is where the algorithm minimizes the loss and estimates the parameters ($\beta_0, \beta_1, \dots, \beta_p$).
 * **Predict:** pass the processed `X_test`, transformed with the *training-fitted* tools from Stage 6, to the model to get predictions $\hat{y}$.
-* **Convert back:** if you transformed the target, the predictions are still on the transformed scale (for example, log-dollars). Use the saved parameters to convert them to the original units (dollars).
+* **Convert back:** if you transformed the target, the predictions are still on the transformed scale (for example, log-dollars). Use the saved parameters to convert them to the original units (e.g., value of a house or car in dollars).
 
 ### Stage 8. Evaluate
 Compare the **converted** predictions against the **original, untouched** `y_test`, using several metrics: MAE, RMSE, and $R^2$. Metrics computed on the transformed scale are not comparable to metrics from a model without a transformation. Also compare training and test error: a much lower training error signals overfitting.
@@ -167,7 +182,7 @@ $$\text{loss} = \text{prediction error} + \alpha \times \text{penalty}(\beta)$$
 | **Ridge** (L2) | sum of squared coefficients | Shrinks all coefficients toward zero; handles correlated features well. |
 | **Lasso** (L1) | sum of absolute coefficients | Can shrink some coefficients exactly to zero, acting as automatic feature selection. |
 
-(scikit-learn scales the terms slightly differently between the two, but the idea is the same.) The **regularization strength $\alpha$** is a *hyperparameter*: $\alpha = 0$ is ordinary linear regression, and larger $\alpha$ means a simpler, more constrained model (more bias, less variance). Features must be scaled first (Stage 6.5), or the penalty would unfairly punish features measured in small units.
+(scikit-learn scales the terms slightly differently between the two, but the idea is the same.) The **regularization strength $\alpha$** is a *hyperparameter*: for Ridge, $\alpha = 0$ recovers ordinary linear regression; for Lasso, $\alpha = 0$ is numerically unstable in scikit-learn, so use plain `LinearRegression` when you want no penalty at all. In both cases, larger $\alpha$ means a simpler, more constrained model (more bias, less variance). Features must be scaled first (Stage 6.5), or the penalty would unfairly punish features measured in small units.
 
 ### 9.3 Hyperparameter Tuning with Grid Search
 You now have several hyperparameters to choose: the polynomial degree, $\alpha$, which method (Ridge or Lasso), and so on. **Grid search** automates the choice:
@@ -186,8 +201,8 @@ Take the single best tuned model, predict on the test set **once**, convert pred
 
 ### Report
 A result nobody understands does not get used. Communicate in the language of the people who will act on it:
-* the **error in original units** ("typically off by about \$18,000"), not just $R^2$,
-* the **most influential features** and the direction of their effects (for an interpretation objective, coefficients in original units with the "holding other features constant" caveat),
+* the **error in original units** ("e.g., typically off by about \$18,000"), not just $R^2$,
+* the **most influential features** and the direction of their effects (for an interpretation objective, coefficients in original units with the "holding other features constant" caveat) — coefficient size alone is not a reliable importance ranking when features are on different scales, correlated, or regularized.
 * the **limitations**: where the model is weak, which assumptions were violated, and what data it was trained on,
 * enough **documentation to reproduce** it: data version, code, `random_state`, and the chosen hyperparameters.
 
@@ -206,7 +221,7 @@ Put the model where it can be used: a batch job that scores a file each night, a
 ### Stage 12. Monitor and Collect Feedback
 A deployed model degrades silently, because the world changes.
 * **Monitor inputs (data drift):** are feature distributions moving away from the training data? Are new categories appearing? Are missing values increasing?
-* **Monitor performance:** when true outcomes become known (the house actually sells), compare them with the predictions and track MAE over time.
+* **Monitor performance:** when true outcomes become known (for instance, when the house actually sells), compare them with the predictions and track MAE over time.
 * **Collect feedback:** user complaints, domain-expert review, and error analysis by segment (does the model fail badly on one neighborhood or price range?).
 
 ### Stage 13. Implement Feedback
@@ -342,7 +357,7 @@ You do not need to memorize either sketch. Their point is the shape: **split fir
 ## 11. Common Mistakes to Avoid
 
 * **Exploring or transforming before the split.** Looking at the test rows, or imputing, encoding, or scaling on the full dataset, lets the test set influence training.
-* **Fitting on the test set.** Always `transform`, never `fit`, on test data.
+* **Fitting on the test set.** Always `transform`, but never `fit`, on test data.
 * **Evaluating on the transformed scale** and comparing that number with models trained without a transformation.
 * **Forgetting to save the transformation parameters** (such as $\lambda$), which makes the inverse step impossible.
 * **Tuning on the test set.** Use cross-validation for every tuning decision, and look at the test set once.
