@@ -1,26 +1,33 @@
 # Regression: Linear Regression Notebooks
 
-This directory contains the linear regression reading material and hands-on Jupyter notebooks, `Guide00` to `Guide05`. Work through them in order.
+Six notebooks, one running example -- predicting Ames, Iowa house sale prices end to end -- following the [13-stage workflow](Guide00_Supervised-ML_Linear_Regression_end-to-end_workflow.md) from problem definition through deployment. Work through them in order; each one recaps and builds on the last.
 
 ## Reading Order
 
 1. **Background (optional refresher):** [../Guide00_Introduction-to-Supervised-Machine-Learning.md](../Guide00_Introduction-to-Supervised-Machine-Learning.md) for the core concepts.
-2. **Read the workflow guide:** [Guide00_Supervised-ML_Linear_Regression_end-to-end_workflow.md](Guide00_Supervised-ML_Linear_Regression_end-to-end_workflow.md). It walks through the 13-stage regression workflow, from defining the problem to monitoring a deployed model, and shows which notebook practices each stage.
-3. **Work through the notebooks** `Guide01` to `Guide05` in order (table below).
+2. **Read the workflow guide:** [Guide00_Supervised-ML_Linear_Regression_end-to-end_workflow.md](Guide00_Supervised-ML_Linear_Regression_end-to-end_workflow.md). It walks through all 13 stages, from defining the problem to monitoring a deployed model, and shows which notebook practices each stage.
+3. **Work through the notebooks** `Guide01` to `Guide06` in order (table below). Run them from this directory -- they import `pipeline/ames_workflow.py` and read from `data/` using relative paths.
 
 ## Notebooks
 
-| Notebook | Topic | Dataset |
+| Notebook | Stage(s) | Covers |
 | :--- | :--- | :--- |
-| `Guide01` | Transforming the target (log, square root, Box-Cox) and a first end-to-end model | California Housing (built into scikit-learn) |
-| `Guide02` | Real workflow: cleaning, EDA, assumption checks, pipelines | `CarPrice_Assignment.csv` |
-| `Guide03` | Encoding, train-test split, and feature scaling | `Ames_Housing_Sales.csv` |
-| `Guide04` | Polynomial regression, pipelines, and grid search | `encoded_car_data.csv` |
-| `Guide05` | Cross-validation, regularization (Lasso, Ridge), `GridSearchCV` | `boston_housing_clean.pickle` |
+| `Guide01` | 1-5 | Define the problem, understand and clean the Ames data, split (2006-2009 train / 2010 test), explore the training set |
+| `Guide02` | 6 | Impute, encode (ordinal + one-hot with rare-category grouping), engineer features, transform the target, scale |
+| `Guide03` | 7-8 | Two baselines (mean, linear regression), cross-validated evaluation, residual diagnostics |
+| `Guide04` | 9 (part 1) | Polynomial/interaction terms, the bias-variance trade-off, and what unchecked flexibility costs |
+| `Guide05` | 9 (part 2) | Cross-validation pitfalls, Ridge and Lasso regularization, `GridSearchCV`, a frozen configuration |
+| `Guide06` | 10-11 (+ 12-13) | The one-time final test, a model card, saving/reloading the pipeline, input validation |
 
-## Data
+Each notebook ends with a short **Your Turn** exercise applying that stage's idea to a second dataset (`CarPrice_Assignment.csv`, `encoded_car_data.csv`, or `california_housing_price.csv`).
 
-The `data/` folder holds the datasets the notebooks load. The notebooks use relative paths such as `data/CarPrice_Assignment.csv`, so run each notebook from this directory.
+## Directory Contents
+
+| Path | What it holds |
+| :--- | :--- |
+| `pipeline/ames_workflow.py` | Shared code the notebooks import and build on across the series (`load_ames`, `clean_ames`, `split_ames`, `add_engineered_features`, `build_preprocessor`). Requires scikit-learn 1.1+. |
+| `data/` | `Ames_Housing_Sales.csv` (the running example) plus three practice datasets used only in the Your Turn exercises. |
+| `archive_v1/` | The previous, superseded set of five notebooks (each on its own dataset) and the retired Boston Housing data. Kept for reference, not part of the current reading order. |
 
 ## Setup
 
