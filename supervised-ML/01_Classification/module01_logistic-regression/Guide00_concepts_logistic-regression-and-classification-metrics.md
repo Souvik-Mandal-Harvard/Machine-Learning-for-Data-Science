@@ -1,7 +1,7 @@
 # Module 1 — Logistic Regression & Classification Metrics
 ### A Reading Guide
 
-> **How to use this guide.** This is a *standalone* reading guide: you can learn the whole module from this document alone. It explains every idea in plain language first, then shows the key mathematics and figures, and finally short Python snippets so you can see it in code. After reading this guide, open the two companion lab guides (`Guide01_lab_human-activity-recognition.md` and `Guide02_lab_clinical-nutrition-multinomial.md`) and the notebooks they walk through (`Guide01_Supervised-ML_Logistic-Regression_Introduction.ipynb` and `Guide02_Supervised-ML_Logistic-Regression_Case-Study.ipynb`) to practice on real data.
+> **How to use this guide.** This is a *standalone* reading guide: you can learn the whole module from this document alone. It explains every idea in plain language first, then shows the key mathematics and figures, and finally short Python snippets so you can see it in code. After reading this guide, open the two lab notebooks (`Guide01_Supervised-ML_Logistic-Regression_Introduction.ipynb`, with a companion lab guide, and `Guide02_Supervised-ML_Logistic-Regression_Case-Study.ipynb`, with its own companion guide `Guide02_lab_clinical-nutrition-multinomial.md`) to practice on real data.
 >
 > **Who this is for.** Students with little or no programming background. Every code block is annotated line by line. You do not need to memorize the code — read it like a recipe and focus on understanding *what each step accomplishes and why*.
 >
@@ -365,13 +365,17 @@ So probability moved from **0.20 to 0.335** after a +1 change in that feature. T
 
 > **Where we are.** We can score and interpret. Now, geometrically: where in the feature space does the model actually switch its answer from one class to the other?
 
-The **decision boundary** is the set of feature values where the model is exactly undecided — where $p(x) = 0.5$, equivalently where $z = \beta_0 + \beta_1 x_1 + \dots = 0$.
+The **decision boundary** is the set of feature values where the model is exactly undecided — where $p(x) = 0.5$. Recall from Section 3 that $\sigma(0) = 0.5$, so "the model is undecided" translates directly into "the linear score is exactly zero": $z = \beta_0 + \beta_1 x_1 + \dots = 0$. On one side of that equation $z$ is positive (so $p>0.5$, predict class 1); on the other side $z$ is negative (so $p<0.5$, predict class 0).
 
-- With **one feature**, the boundary is a single **point** on the number line.
-- With **two features**, it is a **straight line** in the 2-D plane.
-- With **many features**, it is a flat **hyperplane**.
+**Why is the boundary always straight?** Because $z$ — the quantity we are setting to zero — is nothing more than a weighted sum of the features, and setting *any* weighted sum equal to zero always traces out a flat shape, never a curve. That holds no matter how many features you have:
 
-The key fact: **logistic regression always has a *linear* decision boundary.** That is both its strength (simple, stable, interpretable) and its limitation (it cannot, on its own, carve out curved regions — later models like SVMs and trees can). To classify a new point, you check which side of the boundary it falls on.
+- With **one feature** ($z = \beta_0 + \beta_1 x_1$), solving $z=0$ gives a single value of $x_1$ — a **point** on the number line.
+- With **two features** ($z = \beta_0 + \beta_1 x_1 + \beta_2 x_2$), solving $z=0$ gives a **straight line** in the 2-D plane.
+- With **many features**, the same equation describes a flat **hyperplane** — the many-dimensional analogue of a line, one dimension short of the full feature space.
+
+**Worked example.** Suppose a churn model has $\beta_0 = -3$ and one feature `tenure_months` with $\beta_1 = 0.5$. The boundary sits where $-3 + 0.5\,x_1 = 0$, i.e. at $x_1 = 6$ months. A customer with 4 months of tenure gets $z = -3 + 0.5(4) = -1$, so $p = \sigma(-1) \approx 0.27$ — predicted class 0 (stays). A customer with 10 months gets $z = 2$, so $p \approx 0.88$ — predicted class 1 (churns). Notice that classifying a point never actually requires drawing anything: you just plug its features into $z$ and check the sign. "Which side of the line" is simply the useful mental picture for that same calculation.
+
+The key fact: **logistic regression always has a *linear* decision boundary.** That is both its strength (simple, stable, interpretable) and its limitation (it cannot, on its own, carve out curved regions — later models like SVMs and trees can).
 
 **Visual cue:** think of the boundary as a "fence." Points on one side are predicted class 0; points on the other side are class 1.
 
@@ -383,28 +387,43 @@ The key fact: **logistic regression always has a *linear* decision boundary.** T
 
 ## 6. Multi-class classification
 
-> **Where we are.** Everything so far assumed two classes. But the Human Activity lab has *six*. Here is how the binary machinery scales up to three, six, or more.
+> **Where we are.** Everything so far assumed two classes, but we often have more than two classes in the real world. Here is how the binary machinery scales up to three, six, or more.
 
 Logistic regression is binary at heart, but two standard strategies extend it to $K > 2$ classes.
 
 ### 6.1 One-vs-Rest (OvR, also called One-vs-All)
 
-Train **$K$ separate binary classifiers**. Classifier $k$ learns to separate "class $k$" from "everything else combined." To predict, run all $K$ classifiers and pick the class whose classifier is most confident.
+Logistic regression, as built so far, only knows how to separate **two** classes. OvR is a simple trick that reuses this binary machinery to handle **$K$ classes** ($K>2$) without changing the underlying algorithm at all.
 
-- *Example (3 classes: churned, cancelled, competitor):* fit "churned vs. not," then "cancelled vs. not," then "competitor vs. not." Each produces its own probability; the largest wins.
-- *Caveat:* OvR trains each class independently. Raw per-class confidence scores need not be jointly consistent, even if a library later normalizes them to sum to 1.
+The idea: train **$K$ separate binary classifiers**, one per class. Classifier $k$ is trained on a *relabeled* copy of the data where every sample belonging to class $k$ is marked "positive," and every sample belonging to *any other* class is lumped together into a single "negative" bucket. Each classifier therefore never sees the full multi-class problem — it only ever answers one narrow yes/no question: "is this class $k$, or is it not?"
+
+*Example (3 classes: churned, cancelled, competitor):*
+
+- Classifier 1 trains on "churned" vs. "everything else" (cancelled + competitor merged into one negative group).
+- Classifier 2 trains on "cancelled" vs. "everything else."
+- Classifier 3 trains on "competitor" vs. "everything else."
+
+Each of the three classifiers outputs its own independent probability for a new sample. To make a final prediction, we run **all $K$ classifiers on it** and pick whichever one reports the highest confidence — an **argmax** operation (see the notation cheat-sheet): "which classifier's probability is largest?"
+
+**Caveat worth remembering.** Because each classifier is trained completely separately, on a different relabeled dataset, there is no guarantee their raw confidence scores sit on a shared, comparable scale — one classifier might report systematically higher probabilities simply because its "everything else" bucket happened to be easier to separate from its target class. A library may normalize the $K$ scores so they sum to 1 for convenience, but that normalization is cosmetic; it does not repair this underlying inconsistency. This is the price OvR pays for its simplicity.
 
 ### 6.2 Multinomial (Softmax) logistic regression
 
-Train **one joint model** that gives every class $k$ its own weight vector and score $z_k = \beta_k^\top x$, then converts all scores into a valid probability distribution with the **softmax** function:
+Multinomial logistic regression takes the opposite approach from OvR: instead of $K$ separate models that never communicate, it trains **one single joint model** that considers all classes at once.
+
+Concretely, every class $k$ gets its own weight vector $\beta_k$ and its own linear score $z_k = \beta_k^\top x$ — the same weighted-sum idea from Section 3, just computed once per class. So for $K$ classes you still end up with $K$ numbers, but — unlike OvR — they all come out of one model fit jointly, which keeps them on a consistent, directly comparable scale.
+
+Those $K$ raw scores are not yet probabilities: they can be negative, and there is nothing forcing them to add up to 1. The **softmax** function repairs both problems in a single step:
 
 $$P(y = k \mid x) = \frac{e^{z_k}}{\displaystyle\sum_{j=1}^{K} e^{z_j}}$$
 
-*In words: give each class its own score, exponentiate every score so they are all positive, then divide each by the total. The results are guaranteed to be positive and to add up to 1 — exactly what a set of probabilities must do.*
+*In words: give each class its own score, exponentiate every score so they are all positive, then divide each by the total of all the exponentiated scores. The results are guaranteed to be positive and to add up to 1 — exactly what a set of probabilities must do.*
 
-The exponentials make every value positive, and dividing by their sum forces the probabilities to add up to 1. The prediction is $\hat{y} = \arg\max_k P(y = k \mid x)$ — the class with the highest probability.
+**Tiny numeric check.** Suppose three classes score $z_1=2$, $z_2=1$, $z_3=0$. Exponentiating gives $e^2\approx7.39$, $e^1\approx2.72$, $e^0=1$, which sum to about $11.11$. Dividing each by that total gives probabilities $\approx0.665, 0.245, 0.090$ — they sum to 1, and class 1 (the largest raw score) ends up with the largest probability, exactly as it should.
 
-In practical implementations, softmax is computed with a numerically stable shift (subtracting $\max_j z_j$ before exponentiating) so large scores do not overflow.
+The final prediction is simply the class with the highest probability, $\hat{y} = \arg\max_k P(y=k\mid x)$ — look at the $K$ probabilities and pick whichever one is largest.
+
+In practical implementations, softmax is computed with a numerically stable shift (subtracting $\max_j z_j$ from every score before exponentiating). This does not change any of the final probabilities — it only keeps the exponentials from overflowing to enormous numbers when the raw scores are large, a numerical-stability detail rather than a change to the math.
 
 ![One-vs-Rest versus multinomial softmax](figures/fig07_multiclass_ovr_softmax.png)
 
@@ -511,7 +530,7 @@ With many features (the Human Activity dataset has **561**), a model can "memori
 | **L2 (Ridge)** | $\lambda \sum_j \beta_j^2$ | Shrinks all coefficients smoothly toward zero | Keeps every feature (none become exactly 0); stable |
 | **L1 (Lasso)** | $\lambda \sum_j \lvert\beta_j\rvert$ | Drives weak coefficients to **exactly zero** | Performs automatic **feature selection** (sparse model) |
 
-**Elastic-Net** blends the two: $\lambda\big[\alpha \sum|\beta_j| + (1-\alpha)\sum \beta_j^2\big]$, where `l1_ratio` = $\alpha$ controls the mix. It is useful when features come in correlated groups.
+**Elastic-Net** blends the two: $\lambda\big[\alpha \sum|\beta_j| + (1-\alpha)\sum \beta_j^2\big]$, where `l1_ratio` = $\alpha$ controls the mix. It is useful when features come in correlated groups: pure L1 tends to arbitrarily keep just one feature from a correlated group and zero out the rest (see the correlated-features warning later in this section), which can make the *selection itself* unstable from one training run to the next. Blending in some L2 lets Elastic-Net spread weight more evenly across a correlated group while still zeroing out features that carry no signal at all — a middle ground between L1's aggressive pruning and L2's "keep everything" behavior.
 
 **Choosing the penalty in `scikit-learn` (version 1.8 or newer).** You select the penalty with a single number, `l1_ratio`:
 
@@ -705,7 +724,7 @@ The **precision–recall (PR) curve** plots precision (y) against recall (x) as 
 
 ![ROC versus PR on imbalanced data](figures/fig12_roc_vs_pr_imbalanced.png)
 
-*This is the single most important plot in the section, and it is worth staring at. **Both panels show the identical model on the identical data** — 5,000 cases of which just 1% are positive, our disease-detection scenario. The ROC curve on the left reports **AUC = 0.942** and looks like a triumph. The PR curve on the right reports **average precision = 0.361** and looks like a problem. The PR curve is the honest one. The reason is the false-positive rate's denominator: with 4,950 negatives available, even hundreds of false alarms barely register as a fraction, so ROC stays flattered. Precision has no such cushion — it counts those false alarms directly against you. **If someone shows you a great AUC on rare-event data, ask to see the PR curve.***
+*This is the single most important plot in the section, and it is worth staring at. **Both panels show the identical model on the identical data** — 5,000 cases of which just 1% are positive, our disease-detection scenario. The ROC curve on the left reports **AUC = 0.942** and looks like a triumph. The PR curve on the right reports **average precision = 0.361** and looks like a problem. The PR curve is the honest one. The reason is the false-positive rate's denominator: with 4,950 negatives available, even hundreds of false alarms barely register as a fraction, so ROC stays flattered. Precision has no such cushion — it counts those false alarms directly against. **If someone shows you a great AUC on rare-event data, ask to see the PR curve.***
 
 **Computing them in code:**
 
@@ -722,7 +741,7 @@ fpr, tpr, thresholds = roc_curve(y_test, scores)      # points to plot the ROC c
 prec, rec, thresholds = precision_recall_curve(y_test, scores)  # points for the PR curve
 ```
 
-### 11.4 Beyond curves: the business decision
+### 11.4 Beyond curves: taking the decision
 
 Curves show performance across *all* thresholds, but in production you must commit to *one* threshold — and the right one depends on the **relative cost** of false positives versus false negatives. If flagging a churn risk triggers an expensive retention offer, you weigh the cost of that offer against the revenue lost if the customer leaves. Once costs pin down a specific threshold, the metrics *at that threshold* (a single precision, recall, or F1) may matter more than the full curve.
 
@@ -739,6 +758,13 @@ With more than two classes, the confusion matrix grows to $K \times K$ (e.g. $6\
 | **Macro** | Plain average across classes (every class counts equally) | All classes matter equally, *especially rare ones* |
 | **Weighted** | Average weighted by each class's number of samples | You want the score to reflect real-world class frequencies |
 | **Micro** | Pool all TP/FP/FN across classes first, then compute | Dominated by frequent classes; in single-label multi-class settings, micro-precision = micro-recall = micro-F1 = accuracy |
+
+**Worked example.** Suppose a 3-class activity model (Sitting, Standing, Walking) gets per-class F1 scores of 0.95 (Sitting, 500 samples), 0.90 (Standing, 480 samples), and 0.40 (Walking, only 20 samples — a rare class the model struggles with).
+
+- **Macro-F1** treats every class equally regardless of size: $(0.95+0.90+0.40)/3 \approx 0.75$. The weak Walking score pulls the average down noticeably, precisely because macro refuses to look away from it.
+- **Weighted-F1** scales each class's contribution by how many samples it has, using weights $500/1000$, $480/1000$, and $20/1000$: $0.95(0.50) + 0.90(0.48) + 0.40(0.02) = 0.915$. The tiny Walking class barely moves the needle because it is such a small share of the data.
+
+Same model, same predictions — yet macro-F1 (0.75) tells you "there is a class we are failing," while weighted-F1 (0.915) tells you "this looks great overall." Both numbers are arithmetically correct; only one of them is useful if that rare class actually matters to you.
 
 **Rule of thumb:** on **imbalanced** data, **macro-F1** is often the most honest single summary, because it refuses to let a large majority class hide poor performance on a small but important minority class. Weighted-F1 can look reassuringly high mainly because large classes dominate the weighted average.
 
@@ -964,6 +990,6 @@ Try to answer these from memory after the capstone; then check yourself against 
 9. On imbalanced multi-class data, why is macro-F1 often preferred over weighted-F1? *(§12)*
 10. Which metrics require `predict_proba` rather than `predict`? *(§10–11)*
 
-*Next: work through the two companion lab guides — the **Human Activity Recognition** lab (`Guide01_lab_human-activity-recognition.md`) and the **Clinical Nutrition** case study (`Guide02_lab_clinical-nutrition-multinomial.md`) — to apply every idea here to real data.*
+*Next: work through the **Human Activity Recognition** lab (`Guide01_Supervised-ML_Logistic-Regression_Introduction.ipynb`, fully self-contained) and the **Clinical Nutrition** case study (`Guide02_Supervised-ML_Logistic-Regression_Case-Study.ipynb`, with its companion guide `Guide02_lab_clinical-nutrition-multinomial.md`) — to apply every idea here to real data.*
 
 *This reading guide is prepared by Souvik Mandal, 2026 to accompany course materials originally structured by Machine Learning Foundation © IBM Corporation.*

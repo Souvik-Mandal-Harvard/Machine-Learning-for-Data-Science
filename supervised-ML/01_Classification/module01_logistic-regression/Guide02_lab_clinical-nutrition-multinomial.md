@@ -3,7 +3,7 @@
 
 > **What this is.** A *standalone* walkthrough of the lab in `Guide02_Supervised-ML_Logistic-Regression_Case-Study.ipynb`. Read it on its own to understand the whole lab, or run alongside the notebook cell by cell. Every code block is annotated.
 >
-> **Prerequisites.** Read the concepts guide (`Guide00_concepts_logistic-regression-and-classification-metrics.md`) and ideally the first lab guide (`Guide01_lab_human-activity-recognition.md`, Human Activity Recognition) first. You will need the data file `food_items.csv` in the shared `data/` folder one level up from this module (the notebook reads `../data/food_items.csv`), and `scikit-learn` 1.8 or newer.
+> **Prerequisites.** Read the concepts guide (`Guide00_concepts_logistic-regression-and-classification-metrics.md`) and ideally the first lab notebook (`Guide01_Supervised-ML_Logistic-Regression_Introduction.ipynb`, Human Activity Recognition, fully self-contained) first. You will need the data file `food_items.csv` in the shared `data/` folder one level up from this module (the notebook reads `../data/food_items.csv`), and `scikit-learn` 1.8 or newer.
 >
 > **Estimated time.** 30–60 minutes. Everything here runs in seconds (the dataset is small), so you can experiment freely.
 
